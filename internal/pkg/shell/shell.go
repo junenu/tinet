@@ -19,6 +19,7 @@ var log = l.New()
 type Tn struct {
 	PreCmd      []PreCmd     `yaml:"precmd"`
 	PreInit     []PreInit    `yaml:"preinit"`
+	PreConf     []PreConf    `yaml:"preconf"`
 	PostInit    []PostInit   `yaml:"postinit"`
 	PostFini    []PostFini   `yaml:"postfini"`
 	Nodes       []Node       `yaml:"nodes" mapstructure:"nodes"`
@@ -35,6 +36,11 @@ type PreCmd struct {
 
 // PreInit
 type PreInit struct {
+	Cmds []Cmd `yaml:"cmds" mapstructure:"cmds"`
+}
+
+// PreConf
+type PreConf struct {
 	Cmds []Cmd `yaml:"cmds" mapstructure:"cmds"`
 }
 
@@ -207,8 +213,8 @@ func (tnconfig *Tn) Exec(nodeName string, Cmds []string) (execCommand string) {
 		var cmdStr string
 		for _, cmd := range Cmds {
 			cmdStr += fmt.Sprintf(" %s", cmd)
-			execCommand += cmdStr
 		}
+		execCommand += cmdStr
 	}
 
 	return execCommand
@@ -226,6 +232,13 @@ func GenerateFile() (genContent string, err error) {
 	}
 
 	preinit := PreInit{
+		Cmds: []Cmd{
+			Cmd{
+				Cmd: "",
+			},
+		},
+	}
+	preconf := PreConf{
 		Cmds: []Cmd{
 			Cmd{
 				Cmd: "",
@@ -341,6 +354,7 @@ func GenerateFile() (genContent string, err error) {
 	tnconfig := &Tn{
 		PreCmd:      []PreCmd{precmd},
 		PreInit:     []PreInit{preinit},
+		PreConf:     []PreConf{preconf},
 		PostInit:    []PostInit{postinit},
 		PostFini:    []PostFini{postfini},
 		Nodes:       []Node{nodes},
